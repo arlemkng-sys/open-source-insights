@@ -270,7 +270,13 @@ export function GameCanvas({
           landed = true;
         }
         if (landed) {
-          if (!player.onGround) spawnParticles(player.x, player.y + player.size / 2, 6, "rgba(120,220,255,0.8)");
+          if (!player.onGround)
+            burst(player.x, player.y + player.size / 2, 12, "rgba(120,220,255,0.85)", {
+              power: 200,
+              up: true,
+              spread: Math.PI * 1.4,
+              gravity: 600,
+            });
           player.onGround = true;
           player.rot = 0;
         } else {
