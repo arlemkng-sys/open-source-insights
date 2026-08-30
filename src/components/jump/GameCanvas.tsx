@@ -20,7 +20,17 @@ export type GameHandlers = {
 
 type ObstacleKind = "spike" | "block" | "platform";
 type Obstacle = { x: number; y: number; w: number; h: number; kind: ObstacleKind };
-type Particle = { x: number; y: number; vx: number; vy: number; life: number; hue: string };
+type Particle = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  decay: number;
+  size: number;
+  gravity: number;
+  hue: string;
+};
 
 const GROUND_RATIO = 0.82;
 const START_LIVES = 2;
@@ -116,21 +126,37 @@ export function GameCanvas({
     let shake = 0;
     let lives = START_LIVES;
     let invulnUntil = 0;
-    let trail: { x: number; y: number }[] = [];
+    let trail: { x: number; y: number; rot: number }[] = [];
     let particles: Particle[] = [];
     const level = buildLevel();
 
     const player = { x: 0, y: 0, size: 34, vy: 0, onGround: true, rot: 0 };
     const groundY = () => height * GROUND_RATIO;
 
-    const spawnParticles = (x: number, y: number, n: number, hue: string) => {
+    /** Explosão radial de partículas neon. */
+    const burst = (
+      x: number,
+      y: number,
+      n: number,
+      hue: string,
+      opts: { power?: number; spread?: number; gravity?: number; up?: boolean } = {},
+    ) => {
+      const power = opts.power ?? 260;
+      const gravity = opts.gravity ?? 900;
       for (let i = 0; i < n; i++) {
+        const angle = opts.up
+          ? -Math.PI / 2 + (Math.random() - 0.5) * (opts.spread ?? Math.PI * 0.9)
+          : Math.random() * Math.PI * 2;
+        const v = power * (0.35 + Math.random() * 0.85);
         particles.push({
-          x,
-          y,
-          vx: (Math.random() - 0.5) * 220,
-          vy: -Math.random() * 220,
+          x: x + (Math.random() - 0.5) * 8,
+          y: y + (Math.random() - 0.5) * 8,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v,
           life: 1,
+          decay: 1.1 + Math.random() * 1.2,
+          size: 2 + Math.random() * 4,
+          gravity,
           hue,
         });
       }
@@ -142,7 +168,13 @@ export function GameCanvas({
       player.vy = -640;
       player.onGround = false;
       jumps += 1;
-      spawnParticles(player.x, player.y + player.size / 2, 8, "rgba(120,255,190,0.9)");
+      burst(player.x, player.y + player.size / 2, 18, "rgba(120,255,190,0.95)", {
+        power: 300,
+        up: true,
+        spread: Math.PI * 1.1,
+        gravity: 700,
+      });
+      burst(player.x, player.y + player.size / 2, 6, "rgba(150,220,255,0.9)", { power: 180 });
       cbRef.current.onJump();
     };
 
@@ -162,13 +194,15 @@ export function GameCanvas({
     const finish = (won: boolean) => {
       if (over) return;
       over = true;
-      shake = won ? 8 : 18;
-      spawnParticles(
+      shake = won ? 10 : 26;
+      burst(
         player.x,
         player.y,
-        26,
+        60,
         won ? "rgba(120,255,190,0.95)" : "rgba(255,120,160,0.95)",
+        { power: 420 },
       );
+      burst(player.x, player.y, 24, "rgba(255,255,255,0.9)", { power: 260 });
       cbRef.current.onEnd({
         score: Math.floor(score),
         jumps,
@@ -181,8 +215,9 @@ export function GameCanvas({
       if (now < invulnUntil) return;
       lives -= 1;
       cbRef.current.onLivesChange(Math.max(0, lives));
-      shake = 16;
-      spawnParticles(player.x, player.y, 20, "rgba(255,120,160,0.95)");
+      shake = 22;
+      burst(player.x, player.y, 46, "rgba(255,120,160,0.95)", { power: 400 });
+      burst(player.x, player.y, 16, "rgba(255,220,120,0.95)", { power: 240, gravity: 400 });
       if (lives <= 0) {
         finish(false);
         return;
@@ -235,7 +270,13 @@ export function GameCanvas({
           landed = true;
         }
         if (landed) {
-          if (!player.onGround) spawnParticles(player.x, player.y + player.size / 2, 6, "rgba(120,220,255,0.8)");
+          if (!player.onGround)
+            burst(player.x, player.y + player.size / 2, 12, "rgba(120,220,255,0.85)", {
+              power: 200,
+              up: true,
+              spread: Math.PI * 1.4,
+              gravity: 600,
+            });
           player.onGround = true;
           player.rot = 0;
         } else {
@@ -243,8 +284,8 @@ export function GameCanvas({
           player.rot += dt * 6;
         }
 
-        trail.unshift({ x: player.x, y: player.y });
-        trail = trail.slice(0, 16);
+        trail.unshift({ x: player.x, y: player.y, rot: player.rot });
+        trail = trail.slice(0, 26);
 
         // colisões
         const px = player.x - player.size / 2 + 6;
@@ -266,12 +307,13 @@ export function GameCanvas({
 
       particles = particles.filter((p) => p.life > 0);
       for (const p of particles) {
-        p.life -= dt * 1.6;
-        p.vy += 900 * dt;
+        p.life -= dt * p.decay;
+        p.vy += p.gravity * dt;
+        p.vx *= 1 - dt * 1.2;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
       }
-      if (shake > 0) shake = Math.max(0, shake - dt * 40);
+      if (shake > 0) shake = Math.max(0, shake - dt * 45);
 
       /* ── draw ── */
       ctx.clearRect(0, 0, width, height);
@@ -352,13 +394,25 @@ export function GameCanvas({
         ctx.restore();
       }
 
-      // rastro
+      // rastro neon
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
       trail.forEach((t, i) => {
-        const a = (1 - i / trail.length) * 0.28;
-        ctx.fillStyle = `rgba(120,255,190,${a})`;
-        const s = player.size * (1 - i / (trail.length * 1.6));
-        ctx.fillRect(t.x - s / 2, t.y - s / 2, s, s);
+        const k = 1 - i / trail.length;
+        const a = k * k * 0.4;
+        const s = player.size * (0.35 + k * 0.65);
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.rotate(t.rot);
+        ctx.shadowColor = "rgba(120,255,190,0.8)";
+        ctx.shadowBlur = 18 * k;
+        ctx.fillStyle = `rgba(${Math.round(120 + 80 * (1 - k))},255,${Math.round(190 + 40 * (1 - k))},${a})`;
+        ctx.beginPath();
+        ctx.roundRect(-s / 2, -s / 2, s, s, 9 * k + 2);
+        ctx.fill();
+        ctx.restore();
       });
+      ctx.restore();
 
       // player (pisca quando invulnerável)
       const blink = invulnerable && Math.floor(now / 90) % 2 === 0;
@@ -378,11 +432,20 @@ export function GameCanvas({
         ctx.restore();
       }
 
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
       for (const p of particles) {
-        ctx.globalAlpha = Math.max(0, p.life);
+        const l = Math.max(0, p.life);
+        ctx.globalAlpha = l;
         ctx.fillStyle = p.hue;
-        ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+        ctx.shadowColor = p.hue;
+        ctx.shadowBlur = 12 * l;
+        const s = p.size * (0.4 + l * 0.8);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, s / 2, 0, Math.PI * 2);
+        ctx.fill();
       }
+      ctx.restore();
       ctx.globalAlpha = 1;
       ctx.restore();
 
