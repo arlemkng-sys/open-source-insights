@@ -10,6 +10,18 @@ import {
   rewardPerJump,
 } from "@/lib/jump/rewards";
 import { creditJump, placeBet, recordGame, settleMatch } from "@/lib/jump/store";
+import {
+  AUDIO_EVENT,
+  initAudio,
+  isMuted,
+  sfxCoin,
+  sfxHit,
+  sfxJump,
+  sfxWin,
+  startMusic,
+  stopMusic,
+  toggleMute,
+} from "@/lib/jump/audio";
 
 export const Route = createFileRoute("/play")({
   head: () => ({
