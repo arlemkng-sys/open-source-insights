@@ -394,13 +394,25 @@ export function GameCanvas({
         ctx.restore();
       }
 
-      // rastro
+      // rastro neon
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
       trail.forEach((t, i) => {
-        const a = (1 - i / trail.length) * 0.28;
-        ctx.fillStyle = `rgba(120,255,190,${a})`;
-        const s = player.size * (1 - i / (trail.length * 1.6));
-        ctx.fillRect(t.x - s / 2, t.y - s / 2, s, s);
+        const k = 1 - i / trail.length;
+        const a = k * k * 0.4;
+        const s = player.size * (0.35 + k * 0.65);
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.rotate(t.rot);
+        ctx.shadowColor = "rgba(120,255,190,0.8)";
+        ctx.shadowBlur = 18 * k;
+        ctx.fillStyle = `rgba(${Math.round(120 + 80 * (1 - k))},255,${Math.round(190 + 40 * (1 - k))},${a})`;
+        ctx.beginPath();
+        ctx.roundRect(-s / 2, -s / 2, s, s, 9 * k + 2);
+        ctx.fill();
+        ctx.restore();
       });
+      ctx.restore();
 
       // player (pisca quando invulnerável)
       const blink = invulnerable && Math.floor(now / 90) % 2 === 0;
