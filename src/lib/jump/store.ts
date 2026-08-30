@@ -19,6 +19,7 @@ export type GameRecord = {
   jumps: number;
   earnedCents: number;
   durationMs: number;
+  betCents?: number;
 };
 
 export type Account = {
