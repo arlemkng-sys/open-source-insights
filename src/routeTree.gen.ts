@@ -15,6 +15,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as WithdrawRouteImport } from './routes/withdraw'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WithdrawRoute = WithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
   '/profile': typeof ProfileRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
   '/profile': typeof ProfileRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,14 +79,24 @@ export interface FileRoutesById {
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
   '/profile': typeof ProfileRoute
+  '/withdraw': typeof WithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
+  fullPaths:
+    '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile' | '/withdraw'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
+  to:
+    '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile' | '/withdraw'
   id:
-    '__root__' | '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
+    | '__root__'
+    | '/'
+    | '/deposit'
+    | '/history'
+    | '/menu'
+    | '/play'
+    | '/profile'
+    | '/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +106,7 @@ export interface RootRouteChildren {
   MenuRoute: typeof MenuRoute
   PlayRoute: typeof PlayRoute
   ProfileRoute: typeof ProfileRoute
+  WithdrawRoute: typeof WithdrawRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/withdraw': {
+      id: '/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof WithdrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -144,6 +170,7 @@ const rootRouteChildren: RootRouteChildren = {
   MenuRoute: MenuRoute,
   PlayRoute: PlayRoute,
   ProfileRoute: ProfileRoute,
+  WithdrawRoute: WithdrawRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
