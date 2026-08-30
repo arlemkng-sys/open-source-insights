@@ -258,13 +258,23 @@ function PlayPage() {
               Fase {Math.round(progress * 100)}% · {score} pts · {jumps} pulos
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setPaused((p) => !p)}
-            className="glass pointer-events-auto rounded-xl px-4 py-2 text-sm font-medium"
-          >
-            {paused ? "▶ Continuar" : "⏸ Pausar"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              className="glass pointer-events-auto rounded-xl px-4 py-2 text-sm font-medium"
+            >
+              {paused ? "▶ Continuar" : "⏸ Pausar"}
+            </button>
+            <button
+              type="button"
+              aria-label={muted ? "Ativar som" : "Mutar som"}
+              onClick={() => setMuted(toggleMute())}
+              className="glass pointer-events-auto rounded-xl px-3 py-2 text-sm font-medium"
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
+          </div>
           <div className="glass rounded-xl px-3 py-2 text-right">
             <p className="font-display text-base font-semibold text-neon sm:text-lg">
               💰 {formatBRL(rewardForJumps(jumps, betCents))}
