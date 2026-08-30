@@ -232,7 +232,7 @@ function PlayPage() {
         <GameCanvas
           runId={runId}
           paused={paused || !!result}
-          handlers={{ onJump, onScore: setScore, onProgress: setProgress, onLivesChange: setLives, onEnd }}
+          handlers={{ onJump, onScore: setScore, onProgress: setProgress, onLivesChange, onEnd }}
         />
 
 
