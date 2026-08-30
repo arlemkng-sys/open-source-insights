@@ -10,6 +10,18 @@ import {
   rewardPerJump,
 } from "@/lib/jump/rewards";
 import { creditJump, placeBet, recordGame, settleMatch } from "@/lib/jump/store";
+import {
+  AUDIO_EVENT,
+  initAudio,
+  isMuted,
+  sfxCoin,
+  sfxHit,
+  sfxJump,
+  sfxWin,
+  startMusic,
+  stopMusic,
+  toggleMute,
+} from "@/lib/jump/audio";
 
 export const Route = createFileRoute("/play")({
   head: () => ({
@@ -50,6 +62,8 @@ function PlayPage() {
   const [lives, setLives] = useState(START_LIVES);
   const [progress, setProgress] = useState(0);
   const jumpsRef = useRef(0);
+  const livesRef = useRef(START_LIVES);
+  const [muted, setMuted] = useState(false);
 
   const balance = account?.balanceCents ?? 0;
 
@@ -57,15 +71,42 @@ function PlayPage() {
     if (ready && !user) navigate({ to: "/", replace: true });
   }, [ready, user, navigate]);
 
+  useEffect(() => {
+    initAudio();
+    setMuted(isMuted());
+    const sync = () => setMuted(isMuted());
+    window.addEventListener(AUDIO_EVENT, sync);
+    return () => {
+      window.removeEventListener(AUDIO_EVENT, sync);
+      stopMusic();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (inMatch && !paused && !result) startMusic();
+    else stopMusic();
+  }, [inMatch, paused, result]);
+
   const onJump = useCallback(() => {
     jumpsRef.current += 1;
     setJumps(jumpsRef.current);
+    sfxJump();
+    if (jumpsRef.current % 5 === 0) sfxCoin();
     if (user) creditJump(user.id, betCents);
   }, [user, betCents]);
+
+  const onLivesChange = useCallback((next: number) => {
+    if (next < livesRef.current) sfxHit();
+    livesRef.current = next;
+    setLives(next);
+  }, []);
 
   const onEnd = useCallback(
     (r: MatchEnd) => {
       setResult(r);
+      stopMusic();
+      if (r.won) sfxWin();
+      else sfxHit();
       if (user) {
         const profit = rewardForJumps(r.jumps, betCents);
         settleMatch(user.id, { won: r.won, betCents, profitCents: profit });
@@ -92,7 +133,9 @@ function PlayPage() {
     jumpsRef.current = 0;
     setJumps(0);
     setScore(0);
+    livesRef.current = START_LIVES;
     setLives(START_LIVES);
+    initAudio();
     setProgress(0);
     setResult(null);
     setPaused(false);
@@ -189,7 +232,7 @@ function PlayPage() {
         <GameCanvas
           runId={runId}
           paused={paused || !!result}
-          handlers={{ onJump, onScore: setScore, onProgress: setProgress, onLivesChange: setLives, onEnd }}
+          handlers={{ onJump, onScore: setScore, onProgress: setProgress, onLivesChange, onEnd }}
         />
 
 
@@ -215,13 +258,23 @@ function PlayPage() {
               Fase {Math.round(progress * 100)}% · {score} pts · {jumps} pulos
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setPaused((p) => !p)}
-            className="glass pointer-events-auto rounded-xl px-4 py-2 text-sm font-medium"
-          >
-            {paused ? "▶ Continuar" : "⏸ Pausar"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              className="glass pointer-events-auto rounded-xl px-4 py-2 text-sm font-medium"
+            >
+              {paused ? "▶ Continuar" : "⏸ Pausar"}
+            </button>
+            <button
+              type="button"
+              aria-label={muted ? "Ativar som" : "Mutar som"}
+              onClick={() => setMuted(toggleMute())}
+              className="glass pointer-events-auto rounded-xl px-3 py-2 text-sm font-medium"
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
+          </div>
           <div className="glass rounded-xl px-3 py-2 text-right">
             <p className="font-display text-base font-semibold text-neon sm:text-lg">
               💰 {formatBRL(rewardForJumps(jumps, betCents))}
