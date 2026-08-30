@@ -72,7 +72,7 @@ function uid() {
 function emptyAccount(user: JumpUser): Account {
   return {
     user,
-    balanceCents: 0,
+    balanceCents: STARTING_BALANCE_CENTS,
     totalJumps: 0,
     totalEarnedCents: 0,
     gamesPlayed: 0,
