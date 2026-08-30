@@ -2,8 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GameCanvas } from "@/components/jump/GameCanvas";
 import { useAccount, useSession } from "@/hooks/use-jump-account";
-import { formatBRL, rewardForJumps } from "@/lib/jump/rewards";
-import { creditJump, recordGame } from "@/lib/jump/store";
+import {
+  BET_OPTIONS_CENTS,
+  MIN_BET_CENTS,
+  formatBRL,
+  rewardForJumps,
+} from "@/lib/jump/rewards";
+import { creditJump, placeBet, recordGame } from "@/lib/jump/store";
 
 export const Route = createFileRoute("/play")({
   head: () => ({
