@@ -20,7 +20,17 @@ export type GameHandlers = {
 
 type ObstacleKind = "spike" | "block" | "platform";
 type Obstacle = { x: number; y: number; w: number; h: number; kind: ObstacleKind };
-type Particle = { x: number; y: number; vx: number; vy: number; life: number; hue: string };
+type Particle = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  decay: number;
+  size: number;
+  gravity: number;
+  hue: string;
+};
 
 const GROUND_RATIO = 0.82;
 const START_LIVES = 2;
