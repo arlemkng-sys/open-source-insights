@@ -62,6 +62,8 @@ function PlayPage() {
   const [lives, setLives] = useState(START_LIVES);
   const [progress, setProgress] = useState(0);
   const jumpsRef = useRef(0);
+  const livesRef = useRef(START_LIVES);
+  const [muted, setMuted] = useState(false);
 
   const balance = account?.balanceCents ?? 0;
 
@@ -69,15 +71,42 @@ function PlayPage() {
     if (ready && !user) navigate({ to: "/", replace: true });
   }, [ready, user, navigate]);
 
+  useEffect(() => {
+    initAudio();
+    setMuted(isMuted());
+    const sync = () => setMuted(isMuted());
+    window.addEventListener(AUDIO_EVENT, sync);
+    return () => {
+      window.removeEventListener(AUDIO_EVENT, sync);
+      stopMusic();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (inMatch && !paused && !result) startMusic();
+    else stopMusic();
+  }, [inMatch, paused, result]);
+
   const onJump = useCallback(() => {
     jumpsRef.current += 1;
     setJumps(jumpsRef.current);
+    sfxJump();
+    if (jumpsRef.current % 5 === 0) sfxCoin();
     if (user) creditJump(user.id, betCents);
   }, [user, betCents]);
+
+  const onLivesChange = useCallback((next: number) => {
+    if (next < livesRef.current) sfxHit();
+    livesRef.current = next;
+    setLives(next);
+  }, []);
 
   const onEnd = useCallback(
     (r: MatchEnd) => {
       setResult(r);
+      stopMusic();
+      if (r.won) sfxWin();
+      else sfxHit();
       if (user) {
         const profit = rewardForJumps(r.jumps, betCents);
         settleMatch(user.id, { won: r.won, betCents, profitCents: profit });
