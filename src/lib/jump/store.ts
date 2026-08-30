@@ -4,7 +4,7 @@
  * Lovable Cloud (auth + database) later: keep all reads/writes going through
  * the functions exported here.
  */
-import { REWARD_PER_JUMP_CENTS, STARTING_BALANCE_CENTS } from "./rewards";
+import { MIN_BET_CENTS, rewardPerJump, STARTING_BALANCE_CENTS } from "./rewards";
 
 export type JumpUser = {
   id: string;
@@ -145,11 +145,12 @@ function saveAccount(account: Account) {
 }
 
 /** Credita um pulo válido. Retorna o novo saldo em centavos. */
-export function creditJump(userId: string): number {
+export function creditJump(userId: string, betCents: number = MIN_BET_CENTS): number {
   const account = getAccount(userId);
   if (!account) return 0;
-  account.balanceCents += REWARD_PER_JUMP_CENTS;
-  account.totalEarnedCents += REWARD_PER_JUMP_CENTS;
+  const gain = rewardPerJump(betCents);
+  account.balanceCents += gain;
+  account.totalEarnedCents += gain;
   account.totalJumps += 1;
   saveAccount(account);
   return account.balanceCents;

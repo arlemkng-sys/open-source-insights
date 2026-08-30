@@ -7,6 +7,7 @@ import {
   MIN_BET_CENTS,
   formatBRL,
   rewardForJumps,
+  rewardPerJump,
 } from "@/lib/jump/rewards";
 import { creditJump, placeBet, recordGame } from "@/lib/jump/store";
 
@@ -57,8 +58,8 @@ function PlayPage() {
   const onJump = useCallback(() => {
     jumpsRef.current += 1;
     setJumps(jumpsRef.current);
-    if (user) creditJump(user.id);
-  }, [user]);
+    if (user) creditJump(user.id, betCents);
+  }, [user, betCents]);
 
   const onGameOver = useCallback(
     (r: NonNullable<Result>) => {
@@ -67,7 +68,7 @@ function PlayPage() {
         recordGame(user.id, {
           score: r.score,
           jumps: r.jumps,
-          earnedCents: rewardForJumps(r.jumps),
+          earnedCents: rewardForJumps(r.jumps, betCents),
           durationMs: r.durationMs,
           betCents,
         });
@@ -230,7 +231,7 @@ function PlayPage() {
                 <Row label="Aposta" value={`- ${formatBRL(betCents)}`} />
                 <Row
                   label="Ganho nesta partida"
-                  value={formatBRL(rewardForJumps(result.jumps))}
+                  value={formatBRL(rewardForJumps(result.jumps, betCents))}
                   highlight
                 />
                 <Row label="Saldo total" value={formatBRL(balance)} />
