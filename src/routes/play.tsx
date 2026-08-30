@@ -133,7 +133,9 @@ function PlayPage() {
     jumpsRef.current = 0;
     setJumps(0);
     setScore(0);
+    livesRef.current = START_LIVES;
     setLives(START_LIVES);
+    initAudio();
     setProgress(0);
     setResult(null);
     setPaused(false);
