@@ -144,14 +144,29 @@ function saveAccount(account: Account) {
   emit(ACCOUNT_EVENT);
 }
 
-/** Credita um pulo válido. Retorna o novo saldo em centavos. */
-export function creditJump(userId: string, betCents: number = MIN_BET_CENTS): number {
+/** Registra um pulo válido (o lucro fica pendente até o fim da partida). */
+export function creditJump(userId: string, _betCents: number = MIN_BET_CENTS): number {
   const account = getAccount(userId);
   if (!account) return 0;
-  const gain = rewardPerJump(betCents);
-  account.balanceCents += gain;
-  account.totalEarnedCents += gain;
   account.totalJumps += 1;
+  saveAccount(account);
+  return account.balanceCents;
+}
+
+/**
+ * Paga uma partida vencida: devolve a aposta + o lucro acumulado.
+ * Em caso de derrota nada é creditado (aposta e lucro são perdidos).
+ */
+export function settleMatch(
+  userId: string,
+  { won, betCents, profitCents }: { won: boolean; betCents: number; profitCents: number },
+): number {
+  const account = getAccount(userId);
+  if (!account) return 0;
+  if (won) {
+    account.balanceCents += betCents + Math.max(0, profitCents);
+    account.totalEarnedCents += Math.max(0, profitCents);
+  }
   saveAccount(account);
   return account.balanceCents;
 }
