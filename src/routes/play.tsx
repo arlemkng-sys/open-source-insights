@@ -43,7 +43,12 @@ function PlayPage() {
   const [score, setScore] = useState(0);
   const [jumps, setJumps] = useState(0);
   const [result, setResult] = useState<Result>(null);
+  const [betCents, setBetCents] = useState<number>(MIN_BET_CENTS);
+  const [inMatch, setInMatch] = useState(false);
+  const [betError, setBetError] = useState<string | null>(null);
   const jumpsRef = useRef(0);
+
+  const balance = account?.balanceCents ?? 0;
 
   useEffect(() => {
     if (ready && !user) navigate({ to: "/", replace: true });
@@ -64,22 +69,104 @@ function PlayPage() {
           jumps: r.jumps,
           earnedCents: rewardForJumps(r.jumps),
           durationMs: r.durationMs,
+          betCents,
         });
       }
     },
-    [user],
+    [user, betCents],
   );
 
-  const restart = () => {
+  const startMatch = (amountCents: number) => {
+    if (!user) return;
+    if (!placeBet(user.id, amountCents)) {
+      setBetError("Saldo insuficiente para essa aposta.");
+      return;
+    }
+    setBetError(null);
+    setBetCents(amountCents);
     jumpsRef.current = 0;
     setJumps(0);
     setScore(0);
     setResult(null);
     setPaused(false);
+    setInMatch(true);
     setRunId((n) => n + 1);
   };
 
+  const backToBet = () => {
+    setInMatch(false);
+    setResult(null);
+    setPaused(false);
+  };
+
   if (!user) return null;
+
+  if (!inMatch) {
+    return (
+      <main className="app-bg flex min-h-[100dvh] items-center justify-center p-5">
+        <div className="glass neon-ring animate-scale-in w-full max-w-md rounded-3xl p-6 sm:p-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Entrada da partida
+          </p>
+          <h1 className="font-display mt-1 text-2xl font-bold">Escolha sua aposta</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Aposta mínima de {formatBRL(MIN_BET_CENTS)}. O valor é debitado do seu saldo
+            simulado ao entrar na partida.
+          </p>
+
+          <div className="mt-5 flex items-center justify-between rounded-xl border border-border px-4 py-3 text-sm">
+            <span className="text-muted-foreground">Saldo disponível</span>
+            <span className="font-display font-semibold text-neon">{formatBRL(balance)}</span>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {BET_OPTIONS_CENTS.map((option) => {
+              const disabled = option > balance;
+              const active = option === betCents;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    setBetCents(option);
+                    setBetError(null);
+                  }}
+                  className={`rounded-xl border px-2 py-3 font-display text-sm font-semibold transition-colors ${
+                    active
+                      ? "border-primary bg-primary/15 text-neon"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  } ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  {formatBRL(option)}
+                </button>
+              );
+            })}
+          </div>
+
+          {betError && <p className="mt-3 text-sm text-destructive">{betError}</p>}
+
+          <div className="mt-6 grid gap-2">
+            <button
+              type="button"
+              disabled={betCents > balance}
+              onClick={() => startMatch(betCents)}
+              className="rounded-xl bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Apostar {formatBRL(betCents)} e jogar
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/menu" })}
+              className="rounded-xl border border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Voltar ao menu
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="app-bg flex min-h-[100dvh] flex-col p-3 sm:p-5">
@@ -89,6 +176,7 @@ function PlayPage() {
           paused={paused || !!result}
           handlers={{ onJump, onScore: setScore, onGameOver }}
         />
+
 
         {/* HUD */}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
