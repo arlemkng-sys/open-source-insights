@@ -227,20 +227,29 @@ function PlayPage() {
               <dl className="mt-6 space-y-2 text-sm">
                 <Row label="Pontuação" value={String(result.score)} />
                 <Row label="Total de pulos" value={String(result.jumps)} />
+                <Row label="Aposta" value={`- ${formatBRL(betCents)}`} />
                 <Row
                   label="Ganho nesta partida"
                   value={formatBRL(rewardForJumps(result.jumps))}
                   highlight
                 />
-                <Row label="Saldo total" value={formatBRL(account?.balanceCents ?? 0)} />
+                <Row label="Saldo total" value={formatBRL(balance)} />
               </dl>
               <div className="mt-6 grid gap-2">
                 <button
                   type="button"
-                  onClick={restart}
-                  className="rounded-xl bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+                  disabled={betCents > balance}
+                  onClick={() => startMatch(betCents)}
+                  className="rounded-xl bg-primary px-4 py-3 font-display text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Jogar novamente
+                  Jogar novamente ({formatBRL(betCents)})
+                </button>
+                <button
+                  type="button"
+                  onClick={backToBet}
+                  className="rounded-xl border border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Mudar aposta
                 </button>
                 <button
                   type="button"
