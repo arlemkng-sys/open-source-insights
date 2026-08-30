@@ -432,11 +432,20 @@ export function GameCanvas({
         ctx.restore();
       }
 
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
       for (const p of particles) {
-        ctx.globalAlpha = Math.max(0, p.life);
+        const l = Math.max(0, p.life);
+        ctx.globalAlpha = l;
         ctx.fillStyle = p.hue;
-        ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+        ctx.shadowColor = p.hue;
+        ctx.shadowBlur = 12 * l;
+        const s = p.size * (0.4 + l * 0.8);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, s / 2, 0, Math.PI * 2);
+        ctx.fill();
       }
+      ctx.restore();
       ctx.globalAlpha = 1;
       ctx.restore();
 
