@@ -49,8 +49,14 @@ function MenuPage() {
             {formatBRL(account?.balanceCents ?? 0)}
           </p>
           <p className="mt-3 text-xs text-muted-foreground">
-            Valor de demonstração. Sem depósitos, saques ou dinheiro real.
+            Valor de demonstração. Depósitos simulados, sem dinheiro real.
           </p>
+          <Link
+            to="/deposit"
+            className="mt-4 inline-block rounded-xl border border-primary px-4 py-2 text-sm font-medium text-neon transition-colors hover:bg-primary/10"
+          >
+            + Depositar
+          </Link>
         </section>
 
         <Link
