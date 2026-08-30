@@ -7,7 +7,7 @@
  * real money.
  */
 
-export const REWARD_PER_JUMP_CENTS = 1; // R$ 0,01
+export const REWARD_PER_JUMP_CENTS = 50; // R$ 0,50
 
 export function formatBRL(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", {
