@@ -145,6 +145,13 @@ function PlayPage() {
             })}
           </div>
 
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            Ganho por pulo nesta aposta:{" "}
+            <span className="font-display font-semibold text-neon">
+              {formatBRL(rewardPerJump(betCents))}
+            </span>
+          </p>
+
           {betError && <p className="mt-3 text-sm text-destructive">{betError}</p>}
 
           <div className="mt-6 grid gap-2">
