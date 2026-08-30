@@ -40,9 +40,6 @@ export function LiveFeedList() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-[10px] text-muted-foreground">
-        Atividade simulada para demonstração.
-      </p>
     </section>
   );
 }

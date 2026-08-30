@@ -11,12 +11,12 @@ export const Route = createFileRoute("/history")({
       {
         name: "description",
         content:
-          "Veja suas partidas anteriores no JumpCoins: data, pulos, duração e ganho simulado.",
+          "Veja suas partidas anteriores no JumpCoins: data, pulos, duração e ganhos.",
       },
       { property: "og:title", content: "Histórico de partidas — JumpCoins" },
       {
         property: "og:description",
-        content: "Partidas anteriores com pulos, duração e ganho simulado.",
+        content: "Partidas anteriores com pulos, duração e ganhos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

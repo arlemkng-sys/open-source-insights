@@ -30,6 +30,17 @@ export type DepositRecord = {
   status: "confirmado";
 };
 
+export type PixKeyType = "cpf" | "email" | "phone" | "random";
+
+export type WithdrawalRecord = {
+  id: string;
+  createdAt: number;
+  amountCents: number;
+  pixKeyType: PixKeyType;
+  pixKey: string;
+  status: "em análise";
+};
+
 export type Account = {
   user: JumpUser;
   balanceCents: number;
@@ -40,6 +51,8 @@ export type Account = {
   history: GameRecord[];
   deposits?: DepositRecord[];
   totalDepositedCents?: number;
+  withdrawals?: WithdrawalRecord[];
+  totalWithdrawnCents?: number;
 };
 
 const USERS_KEY = "jumpcoins:users";
@@ -226,4 +239,45 @@ export function recordGame(
   account.history.unshift({ id: uid(), playedAt: Date.now(), ...data });
   account.history = account.history.slice(0, 50);
   saveAccount(account);
+}
+
+/** Valor mínimo por solicitação de saque. */
+export const MIN_WITHDRAW_CENTS = 2000; // R$ 20,00
+
+export type WithdrawResult =
+  | { ok: true; record: WithdrawalRecord }
+  | { ok: false; error: string };
+
+/**
+ * Solicita um saque via PIX. O valor é reservado do saldo e a solicitação fica
+ * em análise. Ponto único de integração para o gateway de pagamento/API.
+ */
+export function requestWithdrawal(
+  userId: string,
+  input: { amountCents: number; pixKeyType: PixKeyType; pixKey: string },
+): WithdrawResult {
+  const account = getAccount(userId);
+  if (!account) return { ok: false, error: "Conta não encontrada." };
+  const amount = Math.round(input.amountCents);
+  if (!Number.isFinite(amount) || amount <= 0)
+    return { ok: false, error: "Informe um valor válido." };
+  if (amount < MIN_WITHDRAW_CENTS)
+    return { ok: false, error: "O valor mínimo para saque é R$ 20,00." };
+  if (amount > account.balanceCents) return { ok: false, error: "Saldo insuficiente." };
+  const key = input.pixKey.trim();
+  if (key.length < 5) return { ok: false, error: "Informe uma chave PIX válida." };
+
+  const record: WithdrawalRecord = {
+    id: uid(),
+    createdAt: Date.now(),
+    amountCents: amount,
+    pixKeyType: input.pixKeyType,
+    pixKey: key,
+    status: "em análise",
+  };
+  account.balanceCents -= amount;
+  account.totalWithdrawnCents = (account.totalWithdrawnCents ?? 0) + amount;
+  account.withdrawals = [record, ...(account.withdrawals ?? [])].slice(0, 50);
+  saveAccount(account);
+  return { ok: true, record };
 }

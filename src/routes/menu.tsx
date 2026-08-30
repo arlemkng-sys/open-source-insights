@@ -11,12 +11,12 @@ export const Route = createFileRoute("/menu")({
       { title: "Menu — JumpCoins" },
       {
         name: "description",
-        content: "Seu painel JumpCoins: saldo simulado, acesso ao jogo, perfil e histórico.",
+        content: "Seu painel JumpCoins: saldo, acesso ao jogo, perfil e histórico.",
       },
       { property: "og:title", content: "Menu — JumpCoins" },
       {
         property: "og:description",
-        content: "Painel do jogador com saldo simulado, jogo, perfil e histórico.",
+        content: "Painel do jogador com saldo, jogo, perfil e histórico.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -44,20 +44,28 @@ function MenuPage() {
 
         <section className="glass neon-ring mt-8 rounded-3xl p-6">
           <p className="text-xs tracking-widest text-muted-foreground uppercase">
-            Saldo simulado
+            Saldo disponível
           </p>
           <p className="mt-2 font-display text-5xl font-bold text-neon">
             {formatBRL(account?.balanceCents ?? 0)}
           </p>
           <p className="mt-3 text-xs text-muted-foreground">
-            Valor de demonstração. Depósitos simulados, sem dinheiro real.
+            Depósitos e saques via PIX.
           </p>
-          <Link
-            to="/deposit"
-            className="mt-4 inline-block rounded-xl border border-primary px-4 py-2 text-sm font-medium text-neon transition-colors hover:bg-primary/10"
-          >
-            + Depositar
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              to="/deposit"
+              className="inline-block rounded-xl border border-primary px-4 py-2 text-sm font-medium text-neon transition-colors hover:bg-primary/10"
+            >
+              + Depositar
+            </Link>
+            <Link
+              to="/withdraw"
+              className="inline-block rounded-xl bg-primary/90 px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+            >
+              Sacar
+            </Link>
+          </div>
         </section>
 
         <Link
