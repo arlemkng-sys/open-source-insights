@@ -292,7 +292,7 @@ export function GameCanvas({
   return (
     <canvas
       ref={canvasRef}
-      className="h-full w-full touch-none rounded-2xl"
+      className="absolute inset-0 block h-full w-full touch-none"
       aria-label="Área de jogo JumpCoins"
     />
   );
