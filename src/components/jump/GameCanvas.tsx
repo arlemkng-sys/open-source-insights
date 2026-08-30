@@ -46,6 +46,8 @@ export function GameCanvas({
     };
     resize();
     window.addEventListener("resize", resize);
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
 
     // state
     let alive = true;
@@ -281,6 +283,7 @@ export function GameCanvas({
       alive = false;
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      ro.disconnect();
       window.removeEventListener("keydown", onKey);
       canvas.removeEventListener("pointerdown", onPointer);
     };
