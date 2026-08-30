@@ -194,13 +194,15 @@ export function GameCanvas({
     const finish = (won: boolean) => {
       if (over) return;
       over = true;
-      shake = won ? 8 : 18;
-      spawnParticles(
+      shake = won ? 10 : 26;
+      burst(
         player.x,
         player.y,
-        26,
+        60,
         won ? "rgba(120,255,190,0.95)" : "rgba(255,120,160,0.95)",
+        { power: 420 },
       );
+      burst(player.x, player.y, 24, "rgba(255,255,255,0.9)", { power: 260 });
       cbRef.current.onEnd({
         score: Math.floor(score),
         jumps,
