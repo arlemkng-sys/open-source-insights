@@ -284,8 +284,8 @@ export function GameCanvas({
           player.rot += dt * 6;
         }
 
-        trail.unshift({ x: player.x, y: player.y });
-        trail = trail.slice(0, 16);
+        trail.unshift({ x: player.x, y: player.y, rot: player.rot });
+        trail = trail.slice(0, 26);
 
         // colisões
         const px = player.x - player.size / 2 + 6;
