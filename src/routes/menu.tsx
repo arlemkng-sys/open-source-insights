@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { LiveFeedList } from "@/components/jump/LiveFeedList";
 import { useAccount, useSession } from "@/hooks/use-jump-account";
 import { formatBRL } from "@/lib/jump/rewards";
 import { signOut } from "@/lib/jump/store";
@@ -90,6 +91,8 @@ function MenuPage() {
             Sair
           </button>
         </div>
+
+        <LiveFeedList />
       </div>
     </main>
   );
