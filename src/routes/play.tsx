@@ -117,8 +117,9 @@ function PlayPage() {
           </p>
           <h1 className="font-display mt-1 text-2xl font-bold">Escolha sua aposta</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Aposta mínima de {formatBRL(MIN_BET_CENTS)}. O valor é debitado do seu saldo
-            simulado ao entrar na partida.
+            Aposta mínima de {formatBRL(MIN_BET_CENTS)}. Você tem 2 vidas: chegue aos 100%
+            da fase para receber a aposta de volta + todo o lucro. Perdendo as 2 vidas, a
+            aposta e o lucro da partida são perdidos.
           </p>
 
           <div className="mt-5 flex items-center justify-between rounded-xl border border-border px-4 py-3 text-sm">
