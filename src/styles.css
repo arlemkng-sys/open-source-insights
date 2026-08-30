@@ -142,3 +142,75 @@
     color: var(--color-foreground);
   }
 }
+
+/* ── JumpCoins theme: dark-first, discreet neon ─────────────── */
+:root {
+  --radius: 1rem;
+  --background: oklch(0.16 0.024 268);
+  --foreground: oklch(0.97 0.005 260);
+  --card: oklch(0.21 0.028 268);
+  --card-foreground: oklch(0.97 0.005 260);
+  --popover: oklch(0.19 0.026 268);
+  --popover-foreground: oklch(0.97 0.005 260);
+  --primary: oklch(0.82 0.19 152);
+  --primary-foreground: oklch(0.18 0.03 165);
+  --secondary: oklch(0.26 0.03 268);
+  --secondary-foreground: oklch(0.96 0.005 260);
+  --muted: oklch(0.25 0.028 268);
+  --muted-foreground: oklch(0.7 0.024 262);
+  --accent: oklch(0.75 0.14 210);
+  --accent-foreground: oklch(0.18 0.03 240);
+  --destructive: oklch(0.65 0.21 20);
+  --destructive-foreground: oklch(0.98 0.005 260);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.82 0.19 152 / 60%);
+
+  --neon: oklch(0.82 0.19 152);
+  --neon-2: oklch(0.75 0.14 210);
+  --neon-3: oklch(0.7 0.19 320);
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-neon: var(--neon);
+  --color-neon-2: var(--neon-2);
+  --color-neon-3: var(--neon-3);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility app-bg {
+  background:
+    radial-gradient(70rem 40rem at 12% -10%, color-mix(in oklch, var(--neon) 12%, transparent), transparent 60%),
+    radial-gradient(60rem 40rem at 95% 0%, color-mix(in oklch, var(--neon-3) 12%, transparent), transparent 60%),
+    var(--background);
+}
+
+@utility glass {
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+@utility neon-ring {
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--neon) 35%, transparent),
+    0 12px 40px -18px color-mix(in oklch, var(--neon) 60%, transparent);
+}
+
+@utility text-neon {
+  color: var(--neon);
+  text-shadow: 0 0 18px color-mix(in oklch, var(--neon) 45%, transparent);
+}
