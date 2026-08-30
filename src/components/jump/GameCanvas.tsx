@@ -215,8 +215,9 @@ export function GameCanvas({
       if (now < invulnUntil) return;
       lives -= 1;
       cbRef.current.onLivesChange(Math.max(0, lives));
-      shake = 16;
-      spawnParticles(player.x, player.y, 20, "rgba(255,120,160,0.95)");
+      shake = 22;
+      burst(player.x, player.y, 46, "rgba(255,120,160,0.95)", { power: 400 });
+      burst(player.x, player.y, 16, "rgba(255,220,120,0.95)", { power: 240, gravity: 400 });
       if (lives <= 0) {
         finish(false);
         return;
