@@ -94,9 +94,18 @@ function DepositPage() {
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             Saldo atual
           </p>
-          <p className="mt-1 font-display text-4xl font-bold text-neon">
-            {formatBRL(account?.balanceCents ?? 0)}
-          </p>
+          <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-display text-4xl font-bold text-neon">
+              {formatBRL(account?.balanceCents ?? 0)}
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/withdraw" })}
+              className="rounded-xl border border-primary px-4 py-2 text-sm font-medium text-neon transition-colors hover:bg-primary/10"
+            >
+              Sacar
+            </button>
+          </div>
 
           <div className="mt-6 grid grid-cols-3 gap-2">
             {PRESETS.map((value) => {
