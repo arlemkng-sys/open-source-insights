@@ -22,6 +22,14 @@ export type GameRecord = {
   betCents?: number;
 };
 
+export type DepositRecord = {
+  id: string;
+  createdAt: number;
+  amountCents: number;
+  method: "pix" | "card";
+  status: "confirmado";
+};
+
 export type Account = {
   user: JumpUser;
   balanceCents: number;
@@ -30,6 +38,8 @@ export type Account = {
   gamesPlayed: number;
   bestScore: number;
   history: GameRecord[];
+  deposits?: DepositRecord[];
+  totalDepositedCents?: number;
 };
 
 const USERS_KEY = "jumpcoins:users";
