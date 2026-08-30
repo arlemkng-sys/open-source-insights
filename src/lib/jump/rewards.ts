@@ -9,6 +9,15 @@
 
 export const REWARD_PER_JUMP_CENTS = 50; // R$ 0,50
 
+/** Valores de aposta disponíveis para entrar em uma partida (em centavos). */
+export const BET_OPTIONS_CENTS = [200, 500, 1000, 2000, 5000, 10000] as const;
+
+/** Aposta mínima para entrar em uma partida: R$ 2,00. */
+export const MIN_BET_CENTS = BET_OPTIONS_CENTS[0];
+
+/** Saldo simulado de boas-vindas para o protótipo. */
+export const STARTING_BALANCE_CENTS = 10000; // R$ 100,00
+
 export function formatBRL(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", {
     style: "currency",
