@@ -126,21 +126,37 @@ export function GameCanvas({
     let shake = 0;
     let lives = START_LIVES;
     let invulnUntil = 0;
-    let trail: { x: number; y: number }[] = [];
+    let trail: { x: number; y: number; rot: number }[] = [];
     let particles: Particle[] = [];
     const level = buildLevel();
 
     const player = { x: 0, y: 0, size: 34, vy: 0, onGround: true, rot: 0 };
     const groundY = () => height * GROUND_RATIO;
 
-    const spawnParticles = (x: number, y: number, n: number, hue: string) => {
+    /** Explosão radial de partículas neon. */
+    const burst = (
+      x: number,
+      y: number,
+      n: number,
+      hue: string,
+      opts: { power?: number; spread?: number; gravity?: number; up?: boolean } = {},
+    ) => {
+      const power = opts.power ?? 260;
+      const gravity = opts.gravity ?? 900;
       for (let i = 0; i < n; i++) {
+        const angle = opts.up
+          ? -Math.PI / 2 + (Math.random() - 0.5) * (opts.spread ?? Math.PI * 0.9)
+          : Math.random() * Math.PI * 2;
+        const v = power * (0.35 + Math.random() * 0.85);
         particles.push({
-          x,
-          y,
-          vx: (Math.random() - 0.5) * 220,
-          vy: -Math.random() * 220,
+          x: x + (Math.random() - 0.5) * 8,
+          y: y + (Math.random() - 0.5) * 8,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v,
           life: 1,
+          decay: 1.1 + Math.random() * 1.2,
+          size: 2 + Math.random() * 4,
+          gravity,
           hue,
         });
       }
@@ -152,7 +168,13 @@ export function GameCanvas({
       player.vy = -640;
       player.onGround = false;
       jumps += 1;
-      spawnParticles(player.x, player.y + player.size / 2, 8, "rgba(120,255,190,0.9)");
+      burst(player.x, player.y + player.size / 2, 18, "rgba(120,255,190,0.95)", {
+        power: 300,
+        up: true,
+        spread: Math.PI * 1.1,
+        gravity: 700,
+      });
+      burst(player.x, player.y + player.size / 2, 6, "rgba(150,220,255,0.9)", { power: 180 });
       cbRef.current.onJump();
     };
 
