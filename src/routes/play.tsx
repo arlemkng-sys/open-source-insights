@@ -18,12 +18,12 @@ export const Route = createFileRoute("/play")({
       {
         name: "description",
         content:
-          "Corra, pule obstáculos neon e acumule R$ 0,50 por pulo no runner rítmico JumpCoins.",
+          "Corra, pule obstáculos neon e acumule saldo por pulo — quanto maior a aposta, maior o ganho.",
       },
       { property: "og:title", content: "Partida — JumpCoins" },
       {
         property: "og:description",
-        content: "Runner rítmico neon: cada pulo vale R$ 0,50 de saldo simulado.",
+        content: "Runner rítmico neon: o ganho por pulo aumenta conforme o valor da aposta.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
