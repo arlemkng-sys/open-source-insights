@@ -91,6 +91,8 @@ function MenuPage() {
             Sair
           </button>
         </div>
+
+        <LiveFeedList />
       </div>
     </main>
   );
