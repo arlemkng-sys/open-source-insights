@@ -11,12 +11,12 @@ export const Route = createFileRoute("/deposit")({
       {
         name: "description",
         content:
-          "Adicione saldo simulado à sua conta JumpCoins para entrar nas partidas apostadas.",
+          "Adicione saldo à sua conta JumpCoins para entrar nas partidas.",
       },
       { property: "og:title", content: "Depósito — JumpCoins" },
       {
         property: "og:description",
-        content: "Depósito de demonstração para recarregar o saldo simulado do JumpCoins.",
+        content: "Recarregue o saldo da sua conta JumpCoins.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -78,7 +78,7 @@ function DepositPage() {
           <div>
             <h1 className="font-display text-3xl font-bold">Depósito</h1>
             <p className="text-sm text-muted-foreground">
-              Recarga simulada — nenhum pagamento real é processado.
+              Recarregue seu saldo com Pix ou cartão.
             </p>
           </div>
           <button
@@ -150,7 +150,7 @@ function DepositPage() {
                     : "border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {m === "pix" ? "Pix (simulado)" : "Cartão (simulado)"}
+                {m === "pix" ? "Pix" : "Cartão"}
               </button>
             ))}
           </div>
@@ -158,7 +158,7 @@ function DepositPage() {
           {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
           {done !== null && (
             <p className="mt-3 text-sm text-neon">
-              Depósito de {formatBRL(done)} confirmado no saldo simulado.
+              Depósito de {formatBRL(done)} confirmado.
             </p>
           )}
 

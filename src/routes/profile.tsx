@@ -11,7 +11,7 @@ export const Route = createFileRoute("/profile")({
       {
         name: "description",
         content:
-          "Perfil JumpCoins com saldo simulado, total de pulos, partidas jogadas e melhor pontuação.",
+          "Perfil JumpCoins com saldo, total de pulos, partidas jogadas e melhor pontuação.",
       },
       { property: "og:title", content: "Perfil do jogador — JumpCoins" },
       {
@@ -45,7 +45,7 @@ function ProfilePage() {
   ];
 
   return (
-    <AppShell title="Perfil" subtitle="Dados do protótipo salvos localmente">
+    <AppShell title="Perfil" subtitle="Sua conta e estatísticas">
       <section className="glass neon-ring flex items-center gap-4 rounded-3xl p-6">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-primary font-display text-2xl font-bold text-primary-foreground">
           {user.username.slice(0, 2).toUpperCase()}
@@ -65,9 +65,6 @@ function ProfilePage() {
         ))}
       </div>
 
-      <p className="pt-2 text-center text-xs text-muted-foreground">
-        Protótipo sem dinheiro real: nenhum depósito, saque ou pagamento está disponível.
-      </p>
     </AppShell>
   );
 }

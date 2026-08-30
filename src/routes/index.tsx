@@ -10,12 +10,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "JumpCoins é um runner rítmico neon: pule obstáculos, acumule pontos e veja seu saldo de protótipo crescer a cada pulo.",
+          "JumpCoins é um runner rítmico neon: pule obstáculos, acumule pontos e veja seu saldo crescer a cada pulo.",
       },
       { property: "og:title", content: "JumpCoins — Jogue. Pule. Acumule." },
       {
         property: "og:description",
-        content: "Runner rítmico neon com saldo simulado a cada pulo. Crie sua conta e jogue.",
+        content: "Runner rítmico neon: ganhe saldo a cada pulo. Crie sua conta e jogue.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -59,21 +59,21 @@ function LandingPage() {
       <div className="grid w-full max-w-5xl items-center gap-12 md:grid-cols-2">
         <section className="animate-fade-in text-center md:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs tracking-widest text-muted-foreground uppercase">
-            Protótipo jogável
+            Jogue agora
           </span>
           <h1 className="mt-5 font-display text-5xl leading-none font-bold sm:text-6xl">
             Jump<span className="text-neon">Coins</span>
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">Jogue. Pule. Acumule.</p>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Um runner rítmico neon com identidade própria. Cada pulo válido soma saldo — de R$ 0,50 (aposta R$ 2) até R$ 25,00 (aposta R$ 100) ao
-            seu saldo de demonstração — valores simulados, sem dinheiro real.
+            Um runner rítmico neon com identidade própria. Cada pulo válido soma saldo — de R$ 0,50 (aposta R$ 2) até R$ 25,00 (aposta R$ 100)
+            direto na sua carteira.
           </p>
           <dl className="mt-8 grid grid-cols-3 gap-3 text-left">
             {[
               ["1 toque", "Space, clique ou toque"],
               ["+R$ 0,50 a R$ 25", "por pulo, conforme a aposta"],
-              ["100%", "local, sem cadastro real"],
+              ["Saque via PIX", "a partir de R$ 20,00"],
             ].map(([k, v]) => (
               <div key={k} className="glass rounded-xl px-3 py-3">
                 <dt className="font-display text-base font-semibold text-neon">{k}</dt>
@@ -144,7 +144,7 @@ function LandingPage() {
               {mode === "signup" ? "Criar conta" : "Entrar"}
             </button>
             <p className="text-center text-xs text-muted-foreground">
-              Autenticação simulada e armazenada apenas neste navegador.
+              Ao continuar você concorda com os Termos de Uso.
             </p>
           </form>
         </section>
