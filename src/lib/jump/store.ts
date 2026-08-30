@@ -156,6 +156,32 @@ export function creditJump(userId: string): number {
 }
 
 /**
+ * Depósito simulado (PROTÓTIPO — nenhum pagamento real acontece).
+ * Substituível depois por um gateway (Stripe/Pix) validado no backend.
+ */
+export function deposit(
+  userId: string,
+  amountCents: number,
+  method: DepositRecord["method"],
+): DepositRecord | null {
+  const account = getAccount(userId);
+  if (!account || !Number.isFinite(amountCents) || amountCents <= 0) return null;
+  const record: DepositRecord = {
+    id: uid(),
+    createdAt: Date.now(),
+    amountCents: Math.round(amountCents),
+    method,
+    status: "confirmado",
+  };
+  account.balanceCents += record.amountCents;
+  account.totalDepositedCents = (account.totalDepositedCents ?? 0) + record.amountCents;
+  account.deposits = [record, ...(account.deposits ?? [])].slice(0, 50);
+  saveAccount(account);
+  return record;
+}
+
+
+/**
  * Debita a aposta de entrada de uma partida (PROTÓTIPO).
  * Retorna false quando o saldo é insuficiente.
  */
