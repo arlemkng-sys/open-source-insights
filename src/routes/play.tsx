@@ -7,6 +7,7 @@ import {
   MIN_BET_CENTS,
   formatBRL,
   rewardForJumps,
+  rewardPerJump,
 } from "@/lib/jump/rewards";
 import { creditJump, placeBet, recordGame } from "@/lib/jump/store";
 
@@ -17,12 +18,12 @@ export const Route = createFileRoute("/play")({
       {
         name: "description",
         content:
-          "Corra, pule obstáculos neon e acumule R$ 0,50 por pulo no runner rítmico JumpCoins.",
+          "Corra, pule obstáculos neon e acumule saldo por pulo — quanto maior a aposta, maior o ganho.",
       },
       { property: "og:title", content: "Partida — JumpCoins" },
       {
         property: "og:description",
-        content: "Runner rítmico neon: cada pulo vale R$ 0,50 de saldo simulado.",
+        content: "Runner rítmico neon: o ganho por pulo aumenta conforme o valor da aposta.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,8 +58,8 @@ function PlayPage() {
   const onJump = useCallback(() => {
     jumpsRef.current += 1;
     setJumps(jumpsRef.current);
-    if (user) creditJump(user.id);
-  }, [user]);
+    if (user) creditJump(user.id, betCents);
+  }, [user, betCents]);
 
   const onGameOver = useCallback(
     (r: NonNullable<Result>) => {
@@ -67,7 +68,7 @@ function PlayPage() {
         recordGame(user.id, {
           score: r.score,
           jumps: r.jumps,
-          earnedCents: rewardForJumps(r.jumps),
+          earnedCents: rewardForJumps(r.jumps, betCents),
           durationMs: r.durationMs,
           betCents,
         });
@@ -143,6 +144,13 @@ function PlayPage() {
               );
             })}
           </div>
+
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            Ganho por pulo nesta aposta:{" "}
+            <span className="font-display font-semibold text-neon">
+              {formatBRL(rewardPerJump(betCents))}
+            </span>
+          </p>
 
           {betError && <p className="mt-3 text-sm text-destructive">{betError}</p>}
 
@@ -230,7 +238,7 @@ function PlayPage() {
                 <Row label="Aposta" value={`- ${formatBRL(betCents)}`} />
                 <Row
                   label="Ganho nesta partida"
-                  value={formatBRL(rewardForJumps(result.jumps))}
+                  value={formatBRL(rewardForJumps(result.jumps, betCents))}
                   highlight
                 />
                 <Row label="Saldo total" value={formatBRL(balance)} />

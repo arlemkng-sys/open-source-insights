@@ -66,13 +66,13 @@ function LandingPage() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">Jogue. Pule. Acumule.</p>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Um runner rítmico neon com identidade própria. Cada pulo válido soma R$ 0,50 ao
+            Um runner rítmico neon com identidade própria. Cada pulo válido soma saldo — de R$ 0,50 (aposta R$ 2) até R$ 25,00 (aposta R$ 100) ao
             seu saldo de demonstração — valores simulados, sem dinheiro real.
           </p>
           <dl className="mt-8 grid grid-cols-3 gap-3 text-left">
             {[
               ["1 toque", "Space, clique ou toque"],
-              ["+R$ 0,50", "por pulo válido"],
+              ["+R$ 0,50 a R$ 25", "por pulo, conforme a aposta"],
               ["100%", "local, sem cadastro real"],
             ].map(([k, v]) => (
               <div key={k} className="glass rounded-xl px-3 py-3">

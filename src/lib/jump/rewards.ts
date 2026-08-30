@@ -7,6 +7,7 @@
  * real money.
  */
 
+/** Ganho por pulo na aposta mínima (R$ 2,00) → R$ 0,50. */
 export const REWARD_PER_JUMP_CENTS = 50; // R$ 0,50
 
 /** Valores de aposta disponíveis para entrar em uma partida (em centavos). */
@@ -25,7 +26,17 @@ export function formatBRL(cents: number): string {
   });
 }
 
-/** Ganho (em centavos) de uma partida com N pulos. */
-export function rewardForJumps(jumps: number): number {
-  return Math.max(0, Math.floor(jumps)) * REWARD_PER_JUMP_CENTS;
+/**
+ * Ganho por pulo (em centavos) proporcional à aposta.
+ * R$ 2 → R$ 0,50 | R$ 5 → R$ 1,25 | R$ 10 → R$ 2,50 | R$ 20 → R$ 5,00
+ * R$ 50 → R$ 12,50 | R$ 100 → R$ 25,00
+ */
+export function rewardPerJump(betCents: number = MIN_BET_CENTS): number {
+  const bet = Math.max(MIN_BET_CENTS, Math.floor(betCents || MIN_BET_CENTS));
+  return Math.round((bet / MIN_BET_CENTS) * REWARD_PER_JUMP_CENTS);
+}
+
+/** Ganho (em centavos) de uma partida com N pulos para uma dada aposta. */
+export function rewardForJumps(jumps: number, betCents: number = MIN_BET_CENTS): number {
+  return Math.max(0, Math.floor(jumps)) * rewardPerJump(betCents);
 }
