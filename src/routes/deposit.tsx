@@ -25,7 +25,7 @@ export const Route = createFileRoute("/deposit")({
   component: DepositPage,
 });
 
-const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
+const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000] as const;
 const MIN_DEPOSIT_CENTS = 500;
 
 function DepositPage() {
@@ -33,7 +33,7 @@ function DepositPage() {
   const { user, ready } = useSession();
   const { account } = useAccount(user?.id);
 
-  const [amountCents, setAmountCents] = useState(PRESETS[1]);
+  const [amountCents, setAmountCents] = useState<number>(2000);
   const [custom, setCustom] = useState("");
   const [method, setMethod] = useState<"pix" | "card">("pix");
   const [error, setError] = useState<string | null>(null);

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DepositRouteImport } from './routes/deposit'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as PlayRouteImport } from './routes/play'
@@ -18,6 +19,11 @@ import { Route as ProfileRouteImport } from './routes/profile'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepositRoute = DepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -43,6 +49,7 @@ const ProfileRoute = ProfileRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/deposit': typeof DepositRoute
   '/history': typeof HistoryRoute
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/deposit': typeof DepositRoute
   '/history': typeof HistoryRoute
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/deposit': typeof DepositRoute
   '/history': typeof HistoryRoute
   '/menu': typeof MenuRoute
   '/play': typeof PlayRoute
@@ -65,14 +74,16 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/history' | '/menu' | '/play' | '/profile'
+  fullPaths: '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history' | '/menu' | '/play' | '/profile'
-  id: '__root__' | '/' | '/history' | '/menu' | '/play' | '/profile'
+  to: '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
+  id:
+    '__root__' | '/' | '/deposit' | '/history' | '/menu' | '/play' | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DepositRoute: typeof DepositRoute
   HistoryRoute: typeof HistoryRoute
   MenuRoute: typeof MenuRoute
   PlayRoute: typeof PlayRoute
@@ -86,6 +97,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deposit': {
+      id: '/deposit'
+      path: '/deposit'
+      fullPath: '/deposit'
+      preLoaderRoute: typeof DepositRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -121,6 +139,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DepositRoute: DepositRoute,
   HistoryRoute: HistoryRoute,
   MenuRoute: MenuRoute,
   PlayRoute: PlayRoute,
