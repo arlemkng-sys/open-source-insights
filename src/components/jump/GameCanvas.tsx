@@ -307,12 +307,13 @@ export function GameCanvas({
 
       particles = particles.filter((p) => p.life > 0);
       for (const p of particles) {
-        p.life -= dt * 1.6;
-        p.vy += 900 * dt;
+        p.life -= dt * p.decay;
+        p.vy += p.gravity * dt;
+        p.vx *= 1 - dt * 1.2;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
       }
-      if (shake > 0) shake = Math.max(0, shake - dt * 40);
+      if (shake > 0) shake = Math.max(0, shake - dt * 45);
 
       /* ── draw ── */
       ctx.clearRect(0, 0, width, height);
