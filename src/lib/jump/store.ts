@@ -4,7 +4,7 @@
  * Lovable Cloud (auth + database) later: keep all reads/writes going through
  * the functions exported here.
  */
-import { REWARD_PER_JUMP_CENTS } from "./rewards";
+import { REWARD_PER_JUMP_CENTS, STARTING_BALANCE_CENTS } from "./rewards";
 
 export type JumpUser = {
   id: string;
