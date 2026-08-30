@@ -145,9 +145,27 @@ export function creditJump(userId: string): number {
   return account.balanceCents;
 }
 
+/**
+ * Debita a aposta de entrada de uma partida (PROTÓTIPO).
+ * Retorna false quando o saldo é insuficiente.
+ */
+export function placeBet(userId: string, amountCents: number): boolean {
+  const account = getAccount(userId);
+  if (!account || amountCents <= 0 || account.balanceCents < amountCents) return false;
+  account.balanceCents -= amountCents;
+  saveAccount(account);
+  return true;
+}
+
 export function recordGame(
   userId: string,
-  data: { score: number; jumps: number; earnedCents: number; durationMs: number },
+  data: {
+    score: number;
+    jumps: number;
+    earnedCents: number;
+    durationMs: number;
+    betCents?: number;
+  },
 ) {
   const account = getAccount(userId);
   if (!account) return;
