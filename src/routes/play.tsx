@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GameCanvas } from "@/components/jump/GameCanvas";
+import { GameCanvas, START_LIVES, type MatchEnd } from "@/components/jump/GameCanvas";
 import { useAccount, useSession } from "@/hooks/use-jump-account";
 import {
   BET_OPTIONS_CENTS,
@@ -9,7 +9,7 @@ import {
   rewardForJumps,
   rewardPerJump,
 } from "@/lib/jump/rewards";
-import { creditJump, placeBet, recordGame } from "@/lib/jump/store";
+import { creditJump, placeBet, recordGame, settleMatch } from "@/lib/jump/store";
 
 export const Route = createFileRoute("/play")({
   head: () => ({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/play")({
   component: PlayPage,
 });
 
-type Result = { score: number; jumps: number; durationMs: number } | null;
+type Result = MatchEnd | null;
 
 function PlayPage() {
   const navigate = useNavigate();
@@ -47,6 +47,8 @@ function PlayPage() {
   const [betCents, setBetCents] = useState<number>(MIN_BET_CENTS);
   const [inMatch, setInMatch] = useState(false);
   const [betError, setBetError] = useState<string | null>(null);
+  const [lives, setLives] = useState(START_LIVES);
+  const [progress, setProgress] = useState(0);
   const jumpsRef = useRef(0);
 
   const balance = account?.balanceCents ?? 0;
@@ -61,14 +63,16 @@ function PlayPage() {
     if (user) creditJump(user.id, betCents);
   }, [user, betCents]);
 
-  const onGameOver = useCallback(
-    (r: NonNullable<Result>) => {
+  const onEnd = useCallback(
+    (r: MatchEnd) => {
       setResult(r);
       if (user) {
+        const profit = rewardForJumps(r.jumps, betCents);
+        settleMatch(user.id, { won: r.won, betCents, profitCents: profit });
         recordGame(user.id, {
           score: r.score,
           jumps: r.jumps,
-          earnedCents: rewardForJumps(r.jumps, betCents),
+          earnedCents: r.won ? profit : -betCents,
           durationMs: r.durationMs,
           betCents,
         });
@@ -88,6 +92,8 @@ function PlayPage() {
     jumpsRef.current = 0;
     setJumps(0);
     setScore(0);
+    setLives(START_LIVES);
+    setProgress(0);
     setResult(null);
     setPaused(false);
     setInMatch(true);
@@ -182,15 +188,31 @@ function PlayPage() {
         <GameCanvas
           runId={runId}
           paused={paused || !!result}
-          handlers={{ onJump, onScore: setScore, onGameOver }}
+          handlers={{ onJump, onScore: setScore, onProgress: setProgress, onLivesChange: setLives, onEnd }}
         />
 
 
+        {/* Barra de progresso da fase */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-white/5">
+          <div
+            className="h-full bg-primary transition-[width] duration-150 ease-linear"
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
+        </div>
+
         {/* HUD */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3 sm:p-4">
+        <div className="pointer-events-none absolute inset-x-0 top-1.5 flex items-start justify-between gap-3 p-3 sm:p-4">
           <div className="glass rounded-xl px-3 py-2 text-xs sm:text-sm">
-            <p className="font-display text-base font-semibold sm:text-lg">{score}</p>
-            <p className="text-muted-foreground">{jumps} pulos</p>
+            <p className="font-display text-base leading-none sm:text-lg">
+              {Array.from({ length: START_LIVES }, (_, i) => (
+                <span key={i} className={i < lives ? "" : "opacity-25 grayscale"}>
+                  ❤️
+                </span>
+              ))}
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              Fase {Math.round(progress * 100)}% · {score} pts · {jumps} pulos
+            </p>
           </div>
           <button
             type="button"
@@ -201,9 +223,11 @@ function PlayPage() {
           </button>
           <div className="glass rounded-xl px-3 py-2 text-right">
             <p className="font-display text-base font-semibold text-neon sm:text-lg">
-              💰 {formatBRL(account?.balanceCents ?? 0)}
+              💰 {formatBRL(rewardForJumps(jumps, betCents))}
             </p>
-            <p className="text-[10px] text-muted-foreground">saldo simulado</p>
+            <p className="text-[10px] text-muted-foreground">
+              lucro da partida · aposta {formatBRL(betCents)}
+            </p>
           </div>
         </div>
 
@@ -231,14 +255,26 @@ function PlayPage() {
         {result && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 px-5 backdrop-blur-md">
             <div className="glass neon-ring animate-scale-in w-full max-w-sm rounded-3xl p-6 text-center">
-              <p className="font-display text-3xl font-bold">FIM DE JOGO</p>
+              <p className="font-display text-3xl font-bold">
+                {result.won ? "VITÓRIA!" : "FIM DE JOGO"}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {result.won
+                  ? "Você chegou aos 100% da fase e recebeu a aposta de volta + todo o lucro."
+                  : "Você perdeu as 2 vidas: a aposta e todo o lucro da partida foram perdidos."}
+              </p>
               <dl className="mt-6 space-y-2 text-sm">
                 <Row label="Pontuação" value={String(result.score)} />
                 <Row label="Total de pulos" value={String(result.jumps)} />
+                <Row label="Progresso" value={`${Math.round(progress * 100)}%`} />
                 <Row label="Aposta" value={`- ${formatBRL(betCents)}`} />
                 <Row
-                  label="Ganho nesta partida"
-                  value={formatBRL(rewardForJumps(result.jumps, betCents))}
+                  label={result.won ? "Recebido" : "Perdido"}
+                  value={
+                    result.won
+                      ? `+ ${formatBRL(betCents + rewardForJumps(result.jumps, betCents))}`
+                      : `- ${formatBRL(betCents)}`
+                  }
                   highlight
                 />
                 <Row label="Saldo total" value={formatBRL(balance)} />
