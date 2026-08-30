@@ -30,6 +30,17 @@ export type DepositRecord = {
   status: "confirmado";
 };
 
+export type PixKeyType = "cpf" | "email" | "phone" | "random";
+
+export type WithdrawalRecord = {
+  id: string;
+  createdAt: number;
+  amountCents: number;
+  pixKeyType: PixKeyType;
+  pixKey: string;
+  status: "em análise";
+};
+
 export type Account = {
   user: JumpUser;
   balanceCents: number;
@@ -40,6 +51,8 @@ export type Account = {
   history: GameRecord[];
   deposits?: DepositRecord[];
   totalDepositedCents?: number;
+  withdrawals?: WithdrawalRecord[];
+  totalWithdrawnCents?: number;
 };
 
 const USERS_KEY = "jumpcoins:users";
