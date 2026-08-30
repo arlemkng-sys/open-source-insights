@@ -128,8 +128,8 @@ export function startMusic() {
   step = 0;
   musicTimer = setInterval(() => {
     const i = step % 8;
-    tone({ type: "triangle", from: BASS[i], duration: 0.22, gain: 0.16 });
-    if (step % 2 === 0) tone({ type: "square", from: LEAD[i], duration: 0.16, gain: 0.07 });
+    tone({ type: "triangle", from: BASS[i] ?? 110, duration: 0.22, gain: 0.16 });
+    if (step % 2 === 0) tone({ type: "square", from: LEAD[i] ?? 440, duration: 0.16, gain: 0.07 });
     if (step % 4 === 2) noise(0.06, 0.06);
     step++;
   }, 250);
